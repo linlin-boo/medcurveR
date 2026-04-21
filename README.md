@@ -1,251 +1,102 @@
 # medcurveR
 
-**medcurveR** is an R package for **tail-aware visualization** and **sparse-tail diagnostics** for **Kaplan–Meier (KM)** and **restricted cubic spline (RCS)** figures in medical research.
+**Tail-aware visualization and sparse-tail diagnostics for Kaplan-Meier and restricted cubic spline figures in medical research**
 
-The package was developed to address a common problem in biomedical data analysis: late follow-up regions in KM curves and extreme tails in spline plots are often sparsely supported, yet they are frequently displayed without explicit diagnostic rules. medcurveR provides a practical workflow for generating publication-oriented figures together with rule-based display restriction and transparent tail diagnostics.
+medcurveR is an R package for generating publication-oriented Kaplan-Meier (KM) and restricted cubic spline (RCS) figures with explicit sparse-tail handling and diagnostic traceability.
+
+## Overview
+
+In medical research, the late follow-up region of a Kaplan-Meier curve and the extreme exposure range of a restricted cubic spline plot are often supported by relatively sparse data. In routine manuscript preparation, these regions are frequently cropped or visually down-weighted, but the rationale is rarely recorded as part of a reproducible workflow.
+
+medcurveR was developed to make sparse-tail handling explicit, rule-based, and reproducible.
+
+## Main functions
+
+- `km_pretty()` – tail-aware KM plot with confidence intervals, risk table, and cutoff diagnostics
+- `km_compare_tail()` – comparison of untruncated, reference, and tail-aware KM outputs
+- `rcs_pretty()` – tail-aware RCS plot with confidence bands, sparse-tail shading, and lower distribution panel
+- `rcs_compare_tail()` – full-range versus tail-aware RCS comparison under matched y-axis scaling
+- `tail_profile()` / `tail_profile_table()` – structured summaries of tail rules, bounds, and sparsity diagnostics
 
 ## Key features
 
-- Tail-aware **Kaplan–Meier plotting**
-- Tail-aware **restricted cubic spline plotting**
-- Rule-based sparse-tail handling rather than ad hoc axis trimming
-- Standardized **tail diagnostics** and summary tables
-- Comparison-oriented plotting workflows
-- Publication-style outputs for medical manuscripts
-- Weighted-compatible plotting workflows
-
-## Why medcurveR?
-
-In applied medical research, investigators often manually trim or zoom survival and spline figures to improve readability. However, these display decisions are often undocumented and difficult to reproduce. medcurveR was designed to make these choices:
-
-- **explicit**
-- **rule-based**
-- **transparent**
-- **reproducible**
-
-The package does **not** introduce a new survival model or spline estimator. Instead, it standardizes how sparse-tail regions are visualized and reported.
+- Rule-based sparse-tail handling for KM and RCS figures
+- Explicit display cutoffs and visible diagnostic summaries
+- Comparison-oriented outputs for transparent figure justification
+- Publication-oriented figure generation for medical and epidemiologic studies
+- Reproducible plotting workflow with inspectable tail decisions
 
 ## Installation
 
-### From GitHub
+You can install the development version from GitHub with:
 
 ```r
-install.packages("remotes")
-remotes::install_github("YOUR-USERNAME/medcurveR")
-install.packages("medcurveR_0.1.2_standardized.tar.gz", repos = NULL, type = "source")
+# install.packages("remotes")
+remotes::install_github("linlin-boo/medcurveR")
 ```
-Main functions
-km_pretty()
 
-Generate a tail-aware Kaplan–Meier plot with optional confidence intervals, risk tables, and rule-based truncation.
+If you are installing from a local source bundle:
 
-km_compare_tail()
+```r
+install.packages("path/to/medcurveR", repos = NULL, type = "source")
+```
 
-Generate a comparison figure showing:
+## Minimal usage
 
-no truncation
-reference software output
-medcurveR tail-aware output
-rcs_pretty()
-
-Generate a tail-aware restricted cubic spline plot with:
-
-overall and nonlinear p values
-reference line
-rule-based display bounds
-lower-panel distribution histogram
-rcs_compare_tail()
-
-Generate a comparison plot between:
-
-full-range spline display
-tail-aware spline display
-tail_profile()
-
-Return structured sparse-tail diagnostic information.
-
-tail_profile_table()
-
-Export diagnostics as a standard table for supplementary material or reporting.
-
-Quick start
-Example 1: Kaplan–Meier plot
+```r
 library(medcurveR)
 
-d <- sim_surv_data(400)
+# Example function calls (adapt to your own data)
+# km_pretty(data = dat, time = "time", event = "event", group = "group")
+# rcs_pretty(data = dat, x = "marker", y = "outcome")
+```
 
-p <- km_pretty(
-  data = d,
-  time = "time",
-  event = "event",
-  group = "group",
-  min_at_risk = 20,
-  cut_mode = "median",
-  title = "Overall survival by tertile"
-)
+## Repository structure
 
-p
-attr(p, "tail_profile")$summary
-Example 2: Restricted cubic spline plot
-library(medcurveR)
+This repository is organized to support both standard R package use and SoftwareX submission requirements.
 
-d <- sim_surv_data(400)
-
-out <- rcs_pretty(
-  data = d,
-  x = "marker",
-  time = "time",
-  event = "event",
-  covariates = c("age", "sex"),
-  family = "cox",
-  min_tail_n = 15,
-  tail_rule = "hybrid",
-  title = "Spline association between marker and survival"
-)
-
-out$plot
-out$tail_profile
-Example 3: Comparison-oriented plotting
-library(medcurveR)
-
-d <- sim_surv_data(400)
-
-km_cmp <- km_compare_tail(
-  data = d,
-  time = "time",
-  event = "event",
-  group = "group",
-  min_at_risk = 20,
-  cut_mode = "median"
-)
-
-km_cmp$plot
-
-rcs_cmp <- rcs_compare_tail(
-  data = d,
-  x = "marker",
-  time = "time",
-  event = "event",
-  covariates = c("age", "sex"),
-  family = "cox",
-  min_tail_n = 15,
-  tail_rule = "hybrid"
-)
-
-rcs_cmp$plot
-Real-data validation
-
-medcurveR has been validated not only on simulated demonstration data but also in simplified real-data workflows derived from epidemiologic datasets.
-
-Validation examples include:
-
-cumulative CHG and incident CMM in a simplified CHARLS-style longitudinal workflow
-weighted-compatible validation in an NHANES-style workflow
-
-These examples were used to confirm that medcurveR can operate in realistic biomedical analysis settings beyond toy data examples.
-
-Output files
-
-Typical outputs generated by medcurveR include:
-
-tail-aware KM figures (.png, .pdf)
-tail-aware RCS figures (.png, .pdf)
-comparison figures
-sparse-tail diagnostic tables (.csv)
-session information for reproducibility
-Package philosophy
-
-medcurveR is built around the following principles:
-
-Tail-aware visualization
-Rule-based display restriction
-Explicit diagnostics
-Comparison-oriented interpretation
-Reproducible figure generation
-What medcurveR is not
-
-medcurveR should not be described as:
-
-a new survival model
-a new spline estimator
-a full complex survey design analysis package
-
-The package currently supports weighted-compatible plotting, but it is not intended to replace dedicated survey-analysis methods for design-based estimation.
-
-Suggested use cases
-
-medcurveR may be useful for:
-
-epidemiologic cohort studies
-clinical prognostic research
-biomarker–outcome association studies
-nonlinear exposure–response visualization
-manuscript figure preparation
-supplementary diagnostic reporting
-Reproducibility
-
-To support reproducible research, users are encouraged to save:
-
-figure outputs
-tail diagnostic tables
-session information
-package version information
-
-Example:
-
-writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
-packageVersion("medcurveR")
-Repository structure
-
-A typical project structure may include:
-
+```text
 medcurveR/
-├── DESCRIPTION
-├── NAMESPACE
-├── README.md
-├── R/
-├── man/
-├── vignettes/
-├── inst/
-├── tests/
-└── data/
-## Citation
+├─ README.md
+├─ LICENSE.txt
+├─ DESCRIPTION
+├─ NAMESPACE
+├─ R/
+├─ man/
+├─ vignettes/              # optional
+├─ inst/                   # optional
+├─ tests/                  # optional
+├─ figures/                # optional: manuscript figures
+└─ repo/
+   └─ src/
+      └─ medcurveR_source_placeholder.txt
+```
 
-If you use **medcurveR** in your work, please cite the corresponding software paper as follows:
+### Important note for SoftwareX submission
 
-**Li Huilin.**  
-*medcurveR: tail-aware visualization and sparse-tail diagnostics for Kaplan–Meier and restricted cubic spline figures in medical research.*  
-Under review.
+SoftwareX asks authors to provide source code in a `repo/src` directory. For an R package, the canonical package source usually remains in the standard top-level package structure (`DESCRIPTION`, `NAMESPACE`, `R/`, `man/`, etc.).
 
-You may also cite the GitHub repository:
+To satisfy the journal check more safely, keep the normal R package layout at the repository root **and also place a source snapshot or source bundle in `repo/src/`**. Two practical options are:
 
-**Li Huilin.**  
-*medcurveR: An R package for tail-aware medical plotting.*  
-GitHub repository: `https://github.com/YOUR-USERNAME/medcurveR`
+1. copy the full package source folder into `repo/src/medcurveR/`, or
+2. place a release source archive (for example, the built package tar.gz) in `repo/src/`.
+
+## Reproducibility and manuscript use
+
+The package is intended for manuscript-oriented figure production, especially when visual interpretation may otherwise extend into weakly supported tails. It does **not** introduce a new survival estimator or a new spline estimator; instead, it standardizes how sparse tails are delimited, documented, and compared in figure workflows.
 
 ## License
 
-This project is released under the **MIT License**.  
-Please see the `LICENSE` file for details.
+This project is released under the MIT License. See `LICENSE.txt` for details.
 
-## Author
+## Citation
 
-**Huilin Li**  
-School of Public Health and Health Science, Tianjin University of Traditional Chinese Medicine, Tianjin, China  
-Email: `13135292005@163.com`
-
-## Project home page
-
-GitHub repository:  
-`https://github.com/linlin-boo/medcurveR`
-
-## Acknowledgement
-
-medcurveR was developed to improve the transparency and reproducibility of graphical communication in medical survival and nonlinear association research.
+If you use this software in academic work, please cite the corresponding software paper and the GitHub repository or release record.
 
 ## Contact
 
-For bug reports, suggestions, or collaboration inquiries, please use:
+- **Li Huilin**
+- **Yuqing Xue** (corresponding author)
+- School of Public Health and Health Science, Tianjin University of Traditional Chinese Medicine, Tianjin, China
 
-- GitHub Issues
-- Email: `13135292005@163.com`
+GitHub repository: <https://github.com/linlin-boo/medcurveR>
